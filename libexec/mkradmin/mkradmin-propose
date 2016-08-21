@@ -31,12 +31,20 @@ set -e
 object=$(seth --to-address "${1?missing address of receiving object}")
 data=$(seth calldata ${2+"${@:2}"})
 
+mkradmin --ensure-account "${0##*/}"
+
 if ! [[ $MKRADMIN_SILENT ]]; then
-  echo >&2 "${0##*/}: Creating action proposal..."
-  echo >&2 "${0##*/}: Receiver: $object"
-  echo >&2 "${0##*/}: Calldata: $data"
+  echo >&2 "Proposing multisig action..."
+  echo >&2 "  receiver   $object"
+  echo >&2 "  calldata   $data"
 fi
 
 sig="propose(address,bytes,uint256)(uint)"
 n=$(seth send @maker_multisig "$sig" "${object#0x}" "${data#0x}" 0)
-echo "Created proposal $n."
+n=$(seth --to-dec "$n")
+if [[ $n = 0 ]]; then
+  echo >&2 "${0##*/}: error: failed to create proposal"
+  exit 1
+else
+  echo "Successfully proposed action $n."
+fi

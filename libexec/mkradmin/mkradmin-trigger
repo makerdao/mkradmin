@@ -15,15 +15,14 @@ elif [[ $(seth --field triggered <<<"$action") = true ]]; then
   exit 1
 fi
 
-echo >&2 "${0##*/}: Triggering action $1..."
+echo >&2 "Triggering action $1..."
 seth send @maker_multisig "trigger(uint)" "$1"
 
 action=$(mkradmin action "$1")
 triggered=$(seth --field triggered <<<"$action")
 if [[ $triggered = true ]]; then
-  echo >&2 "${0##*/}: Action triggered successfully."
+  echo >&2 "Action $1 triggered successfully."
 else
   echo >&2 "${0##*/}: error: failed to trigger action"
   exit 1
 fi
-

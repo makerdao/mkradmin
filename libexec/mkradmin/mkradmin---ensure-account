@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+if ! [[ $SETH_FROM ]]; then
+  echo "$1: error: \`MKRADMIN_ACCOUNT' not set"
+  echo "$1: please set this variable in \`~/.mkradminrc':"
+  echo "MKRADMIN_ACCOUNT=0x1234567890123456789012345678901234567890"
+  exit 1
+fi

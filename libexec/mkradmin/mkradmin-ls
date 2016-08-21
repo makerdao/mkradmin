@@ -12,7 +12,7 @@ actions=$(seth --field actions <<<"$info")
 case $1 in -a|--all) all=1; shift; esac
 if [[ $1 ]]; then all=1; else set -- $(seq "$actions"); fi
 
-printf "%7s\t%14s\t%-14s\t%s\n" \
+printf "%7s\t%14s\t%14s\t%s\n" \
 ACTION CONFIRMATIONS EXPIRATION STATUS
 
 display-action() {
@@ -22,7 +22,7 @@ display-action() {
   expiration=$(seth --field expiration <<<"$action")
   confirmations=$(seth --field confirmations <<<"$action")
   status=$(seth --field status <<<"$action")
-  printf "%7s\t%14s\t%-14s\t%s\n" "$1" \
+  printf "%7s\t%14s\t%14s\t%s\n" "$1" \
     "$confirmations/$admins (need $quorum)" \
     "$(pretty-date "$expiration")" "$status"
 }

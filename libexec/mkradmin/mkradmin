@@ -9,12 +9,11 @@ if ! [[ $MKRADMIN_INITIALIZED ]]; then
   [[ -e ~/.mkradminrc ]] && . ~/.mkradminrc
 fi
 
-
 if [[ $2 = --help ]]; then
   exec "${0##*/}" help "$1"
 elif [[ ${1-help} = help ]]; then
   exec "${0##*/}-${1-help}" "${@:2}"
 fi
 
-export SETH_FROM=$MKRADMIN_ACCOUNT
+export SETH_FROM=${SETH_FROM-$MKRADMIN_ACCOUNT}
 exec "${0##*/}-$@"
