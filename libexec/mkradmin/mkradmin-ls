@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -e
+### mkradmin-ls -- list proposed multisig actions
+### Usage: mkradmin ls [-a|--all]
+
+info=$(mkradmin --info)
+export MKRADMIN_INFO=$info
+quorum=$(seth --field quorum <<<"$info")
+admins=$(seth --field admins <<<"$info")
+actions=$(seth --field actions <<<"$info")
+
+case $1 in -a|--all) all=1; shift; esac
+if [[ $1 ]]; then all=1; else set -- $(seq "$actions"); fi
+
+printf "%7s\t%14s\t%-14s\t%s\n" \
+ACTION CONFIRMATIONS EXPIRATION STATUS
+
+display-action() {
+  action=$(mkradmin action "$id")
+  expired=$(seth --field expired <<<"$action")
+  if [[ ! $all && $expired = true ]]; then return; fi
+  expiration=$(seth --field expiration <<<"$action")
+  confirmations=$(seth --field confirmations <<<"$action")
+  status=$(seth --field status <<<"$action")
+  printf "%7s\t%14s\t%-14s\t%s\n" "$1" \
+    "$confirmations/$admins (need $quorum)" \
+    "$(pretty-date "$expiration")" "$status"
+}
+
+pretty-date() if (($(date +%s) < $1)); then
+  seconds=$(($1 - $(date +%s)))
+  if ((seconds > 3600)); then
+    echo "$((seconds / 60 / 60)) h left"
+  else
+    echo "$((seconds / 60)) min left"
+  fi
+elif [[ $(date -d "@$1" +%Y) = $(date +%Y) ]]; then
+  date -d "@$expiration" +"%b %d %H:%M"
+else
+  date -d "@$expiration" +"%b %d %Y"
+fi
+
+for id; do display-action "$id" & done | sort -n

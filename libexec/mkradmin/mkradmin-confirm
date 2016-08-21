@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+### mkradmin-confirm -- confirm proposed multisig action
+### Usage: mkradmin confirm <action>
+
+: ${1?missing action identifier}
+
+if ! [[ $MKRADMIN_ACCOUNT ]]; then
+  echo "${0##*/}: error: \`MKRADMIN_ACCOUNT' not set"
+  echo "${0##*/}: please set this variable in \`~/.mkradminrc':"
+  echo "MKRADMIN_ACCOUNT=0x1234567890123456789012345678901234567890"
+  exit 1
+fi
+
+seth send @maker_multisig "confirm(uint)" "$1"

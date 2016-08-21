@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -e
+### mkradmin-trigger -- trigger confirmed multisig action
+### Usage: mkradmin trigger <action>
+
+action=$(mkradmin action "${1?missing action identifier}")
+if [[ $(seth --field expired <<<"$action") = true ]]; then
+  echo >&2 "${0##*/}: error: action expired: $1"
+  exit 1
+elif [[ $(seth --field confirmed <<<"$action") = false ]]; then
+  echo >&2 "${0##*/}: error: action not confirmed: $1"
+  exit 1
+elif [[ $(seth --field triggered <<<"$action") = true ]]; then
+  echo >&2 "${0##*/}: error: action already triggered: $1"
+  exit 1
+fi
+
+echo >&2 "${0##*/}: Triggering action $1..."
+seth send @maker_multisig "trigger(uint)" "$1"
+
+action=$(mkradmin action "$1")
+triggered=$(seth --field triggered <<<"$action")
+if [[ $triggered = true ]]; then
+  echo >&2 "${0##*/}: Action triggered successfully."
+else
+  echo >&2 "${0##*/}: error: failed to trigger action"
+  exit 1
+fi
+

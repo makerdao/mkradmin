@@ -1,0 +1,3 @@
+#!/bin/sh -e
+info=${MKRADMIN_INFO-$(mkradmin --info)}
+seth --field quorum <<<"$info"

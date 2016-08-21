@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -e
+### mkradmin-propose -- propose new multisig action
+### Usage: mkradmin propose [-o <origin>] <object> <sig> [<args>]
+###    or: mkradmin propose [-o <origin>] <object> [<data>]
+###
+### Submit a proposal for the multisig to call <object> with <data>.
+### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
+###
+### Anyone can propose an action, so <origin> can be any address.
+###
+### Examples:
+###
+###    # Propose paying out 500 MKR to a certain address:
+###    $ mkradmin propose @mkr_token "transfer(address,uint256)" \
+###        0x9a525242f3e563a1921dfd170c6ff7e48111fdde \
+###        500''000000''000000''000000
+###
+###    # Propose transferring ownership of the root authority:
+###    $ mkradmin propose @maker_root_auth \
+###        "updateAuthority(address,uint8)" \
+###        @maker_new_multisig 0x00
+###
+###    # Propose claiming a feedbase identifier from the multisig:
+###    $ mkradmin propose @feedbase "claim()"
+###
+### See also mkradmin-confirm(1), mkradmin-trigger(1), mkradmin-ls(1).
+
+[[ $1 ]] || { mkradmin propose --help; exit 1; }
+
+object=$(seth --to-address "${1?missing address of receiving object}")
+data=$(seth calldata ${2+"${@:2}"})
+
+if ! [[ $MKRADMIN_SILENT ]]; then
+  echo >&2 "${0##*/}: Creating action proposal..."
+  echo >&2 "${0##*/}: Receiver: $object"
+  echo >&2 "${0##*/}: Calldata: $data"
+fi
+
+sig="propose(address,bytes,uint256)(uint)"
+n=$(seth send @maker_multisig "$sig" "${object#0x}" "${data#0x}" 0)
+echo "Created proposal $n."

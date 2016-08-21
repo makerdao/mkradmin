@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+### mkradmin -- MakerDAO admin multisig CLI
+### Usage: mkradmin <command> [<args>]
+###    or: mkradmin <command> --help
+
+if ! [[ $MKRADMIN_INITIALIZED ]]; then
+  export MKRADMIN_INITIALIZED=1
+  [[ -e ~/.mkradminrc ]] && . ~/.mkradminrc
+fi
+
+
+if [[ $2 = --help ]]; then
+  exec "${0##*/}" help "$1"
+elif [[ ${1-help} = help ]]; then
+  exec "${0##*/}-${1-help}" "${@:2}"
+fi
+
+export SETH_FROM=$MKRADMIN_ACCOUNT
+exec "${0##*/}-$@"
