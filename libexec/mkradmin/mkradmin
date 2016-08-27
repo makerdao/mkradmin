@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
-set -e
 ### mkradmin -- MakerDAO admin multisig CLI
 ### Usage: mkradmin <command> [<args>]
 ###    or: mkradmin <command> --help
 
-if ! [[ $MKRADMIN_INITIALIZED ]]; then
-  export MKRADMIN_INITIALIZED=1
-  [[ -e ~/.mkradminrc ]] && . ~/.mkradminrc
-fi
+set -e
 
 if [[ $2 = --help ]]; then
   exec "${0##*/}" help "$1"
 elif [[ ${1-help} = help ]]; then
   exec "${0##*/}-${1-help}" "${@:2}"
+fi
+
+if ! [[ $MKRADMIN_INITIALIZED ]]; then
+  export MKRADMIN_INITIALIZED=1
+  [[ -e ~/.mkradminrc ]] && . ~/.mkradminrc
+  now=$(date +%s)
+  last=$(seth block latest timestamp)
+  age=$((now - last))
+  if ((age > 600)); then
+    echo >&2 "${0##*/}: warning: the last block is $age seconds old"
+    echo >&2 "${0##*/}: ensure your chain is synced and your clock accurate"
+  fi
 fi
 
 export SETH_FROM=${SETH_FROM-$MKRADMIN_ACCOUNT}
