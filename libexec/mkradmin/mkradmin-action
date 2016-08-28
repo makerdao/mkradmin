@@ -4,15 +4,16 @@ if ! [[ $1 ]] || [[ $1 = -* ]]; then
   exec mkradmin ls "$@"
 fi
 
-# TODO: New version of `DSEasyMultisig' has the following signature:
-# sig="getActionStatus(uint256)(uint256,uint256,bool,address,uint256)"
-sig="getActionStatus(uint256)(uint256,uint256,bool)"
+sig="getActionStatus(uint256)(uint256,uint256,bool,address,uint256)"
 values=($(seth call @maker_multisig "$sig" "$1"))
 
 action=$1
 confirmations=$(seth --to-dec "${values[0]}")
 expiration=$(seth --to-dec "${values[1]}")
 triggered=${values[2]}
+target=$(seth --to-address "${values[3]}")
+value=$(seth --to-dec "${values[4]}")
+value=$(seth --to-eth "$value")
 
 if (($(date +%s) >= expiration)); then
   expired=true
@@ -41,7 +42,16 @@ if [[ $expiration = 0 ]]; then
   echo >&2 "${0##*/}: error: no such action: $1"
   exit 1
 else
-  properties=(confirmations confirmed expiration expired triggered status)
+  properties=(
+    confirmations
+    confirmed
+    expiration
+    expired
+    status
+    target
+    triggered
+    value
+  )
   for name in "${properties[@]}"; do  
     printf "%-15s\t%s\n" "$name" "${!name}"
   done

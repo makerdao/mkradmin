@@ -19,7 +19,7 @@ if ! [[ $MKRADMIN_INITIALIZED ]]; then
   age=$((now - last))
   if ((age > 600)); then
     echo >&2 "${0##*/}: warning: the last block is $age seconds old"
-    echo >&2 "${0##*/}: ensure your chain is synced and your clock accurate"
+    echo >&2 "${0##*/}: ensure that chain is synced and clock is accurate"
   fi
 fi
 
