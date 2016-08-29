@@ -22,7 +22,7 @@ else
 fi
 
 quorum=$(mkradmin --quorum)
-if ((confirmations > quorum)); then
+if ((confirmations >= quorum)); then
   confirmed=true
 else
   confirmed=false
