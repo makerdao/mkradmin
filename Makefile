@@ -1,4 +1,5 @@
 prefix ?= /usr/local
+SHELL = bash
 
 dirs = {bin,libexec}
 dirs:; mkdir -p $(prefix)/$(dirs)
