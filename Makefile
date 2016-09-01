@@ -1,6 +1,8 @@
 prefix ?= /usr/local
 SHELL = bash
 
+default:
+
 dirs = {bin,libexec}
 dirs:; mkdir -p $(prefix)/$(dirs)
 files = $(shell ls -d $(dirs)/*)
