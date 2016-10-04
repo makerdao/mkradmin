@@ -32,7 +32,7 @@ if [[ $triggered = true ]]; then
   status=Triggered
 elif [[ $expired = true ]]; then
   status=Expired
-elif [[ $passed = true ]]; then
+elif [[ $confirmed = true ]]; then
   status=Untriggered
 else
   status=Unconfirmed
