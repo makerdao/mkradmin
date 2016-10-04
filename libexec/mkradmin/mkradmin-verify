@@ -12,7 +12,7 @@ data=$(seth calldata ${3+"${@:3}"})
 sig="propose(address,bytes,uint256)(uint)"
 expected=$(seth calldata "$sig" "${target#0x}" "${data#0x}" 0)
 actual=$(seth tx "$1" input)
-if diff <(echo "$expected") <(echo "$actual"); then
+if diff -U9999 <(fold -w 64 <<<"$expected") <(fold -w 64 <<<"$actual"); then
   echo "Transaction matches expected calldata."
 else
   echo >&2 "${0##*/}: error: transaction does not match expected calldata"
