@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+### mkradmin-verify -- verify the a multisig action
+### Usage: mkradmin verify <tx-hash> <target> <sig> [<args>]
+###    or: mkradmin verify <tx-hash> <target> [<data>]
+###
+### Verify that <action> is a proposal to to call <target> with <data>.
+### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
+set -e
+[[ $2 ]] || { mkradmin verify --help; exit 1; }
+target=$(seth --to-address "${2?missing target address}")
+data=$(seth calldata ${3+"${@:3}"})
+sig="propose(address,bytes,uint256)(uint)"
+expected=$(seth calldata "$sig" "${target#0x}" "${data#0x}" 0)
+actual=$(seth tx "$1" input)
+if diff <(echo "$expected") <(echo "$actual"); then
+  echo "Transaction matches expected calldata."
+else
+  echo "${0##*/}: error: transaction does not match expected calldata"
+fi
