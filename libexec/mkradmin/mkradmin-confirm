@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -e
-### mkradmin-confirm -- confirm proposed multisig action
+### mkradmin-confirm -- confirm a proposed multisig action
 ### Usage: mkradmin confirm <action>
+set -e
 : ${1?missing action identifier}
 mkradmin --ensure-account "${0##*/}"
 echo >&2 "Confirming action $1..."
