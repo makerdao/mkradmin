@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-### mkradmin-verify -- verify the a multisig action
+### mkradmin-verify -- verify the meaning of a multisig action
 ### Usage: mkradmin verify <tx-hash> <target> <sig> [<args>]
 ###    or: mkradmin verify <tx-hash> <target> [<data>]
 ###
