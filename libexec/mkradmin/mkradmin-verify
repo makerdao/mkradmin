@@ -3,7 +3,7 @@
 ### Usage: mkradmin verify <tx-hash> <target> <sig> [<args>]
 ###    or: mkradmin verify <tx-hash> <target> [<data>]
 ###
-### Verify that <tx-hash> creates a proposal to to call <target> with <data>.
+### Verify that <tx-hash> creates a proposal to call <target> with <data>.
 ### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
 set -e
 [[ $2 ]] || { mkradmin verify --help; exit 1; }
