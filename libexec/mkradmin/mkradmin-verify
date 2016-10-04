@@ -15,5 +15,6 @@ actual=$(seth tx "$1" input)
 if diff <(echo "$expected") <(echo "$actual"); then
   echo "Transaction matches expected calldata."
 else
-  echo "${0##*/}: error: transaction does not match expected calldata"
+  echo >&2 "${0##*/}: error: transaction does not match expected calldata"
+  exit 1
 fi
