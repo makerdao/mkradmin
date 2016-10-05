@@ -2,7 +2,10 @@
 ### mkradmin-confirm -- confirm a proposed multisig action
 ### Usage: mkradmin confirm <action>
 set -e
-: ${1?missing action identifier}
-mkradmin --ensure-account "${0##*/}"
-echo >&2 "Confirming action $1..."
-seth send @maker_multisig "confirm(uint)" "$1"
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
+echo "Confirming action ${1?which action?}..."
+
+seth send @mkr_ms "confirm(uint)(bool)" "$1" ||
+fail "error: failed to confirm action $1"
+
+echo "Successfully confirmed action $1."

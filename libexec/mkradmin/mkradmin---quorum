@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -e
-info=${MKRADMIN_INFO-$(mkradmin --info)}
-seth --field quorum <<<"$info"

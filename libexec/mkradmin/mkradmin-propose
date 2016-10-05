@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
 ### mkradmin-propose -- propose a new multisig action
 ### Usage: mkradmin propose <target> <sig> [<args>]
-###    or: mkradmin propose <target> [<data>]
+###    or: mkradmin propose <target> <data>
 ###
 ### Submit a proposal for the multisig to call <target> with <data>.
-### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
+### If <sig> has the form `<name>(<types>)', then infer <data> from <args>.
 set -e
-[[ $1 ]] || { mkradmin propose --help; exit 1; }
-target=$(seth --to-address "${1?missing target address}")
-data=$(seth calldata ${2+"${@:2}"})
-mkradmin --ensure-account "${0##*/}"
-if ! [[ $MKRADMIN_SILENT ]]; then
-  echo >&2 "Proposing multisig action..."
-  echo >&2 "  receiver   $target"
-  echo >&2 "  calldata   $data"
-fi
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
+[[ $2 ]] || { mkradmin propose --help; exit 1; }
+
+target=$(seth --to-address "${1?which target address?}")
+calldata=$(seth calldata ${2+"${@:2}"})
+
+cat >&2 <<.
+Proposing multisig action...
+  target     $target
+  calldata   $calldata
+.
+
 sig="propose(address,bytes,uint256)(uint)"
-n=$(seth send @maker_multisig "$sig" "${target#0x}" "${data#0x}" 0)
+n=$(seth send @mkr_ms "$sig" "${target#0x}" "${calldata#0x}" 0)
 n=$(seth --to-dec "$n")
-if [[ $n = 0 ]]; then
-  echo >&2 "${0##*/}: error: failed to create proposal"
-  exit 1
-else
-  echo "Successfully proposed action $n."
-fi
+
+[[ $n -gt 0 ]] || fail "error: failed to create proposal"
+
+echo "Successfully proposed action $n."

@@ -1,28 +1,27 @@
 #!/usr/bin/env bash
-set -e
 ### mkradmin-trigger -- trigger confirmed multisig action
 ### Usage: mkradmin trigger <action>
+set -e
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
 
-action=$(mkradmin action "${1?missing action identifier}")
-if [[ $(seth --field expired <<<"$action") = true ]]; then
-  echo >&2 "${0##*/}: error: action expired: $1"
-  exit 1
-elif [[ $(seth --field confirmed <<<"$action") = false ]]; then
-  echo >&2 "${0##*/}: error: action not confirmed: $1"
-  exit 1
-elif [[ $(seth --field triggered <<<"$action") = true ]]; then
-  echo >&2 "${0##*/}: error: action already triggered: $1"
-  exit 1
+action=$(mkradmin action "${1?which action?}")
+get() { seth --field "$1" <<<"$action"; }
+
+if [[ $(get expired) = true ]]; then
+  fail "error: action $1 expired"
+elif [[ $(get confirmed) = false ]]; then
+  fail "error: action $1 not confirmed"
+elif [[ $(get triggered) = true ]]; then
+  fail "error: action $1 already triggered"
 fi
 
-echo >&2 "Triggering action $1..."
-seth send @maker_multisig "trigger(uint)" "$1"
+echo "Triggering action $1..."
+seth send @mkr_ms "trigger(uint)" "$1"
 
 action=$(mkradmin action "$1")
-triggered=$(seth --field triggered <<<"$action")
-if [[ $triggered = true ]]; then
-  echo >&2 "Action $1 triggered successfully."
+
+if [[ $(get triggered) = true ]]; then
+  echo "Action $1 successfully triggered."
 else
-  echo >&2 "${0##*/}: error: failed to trigger action"
-  exit 1
+  fail "failed to trigger action $1"
 fi

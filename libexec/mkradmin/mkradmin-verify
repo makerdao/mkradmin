@@ -1,20 +1,44 @@
 #!/usr/bin/env bash
 ### mkradmin-verify -- verify the meaning of a multisig action
 ### Usage: mkradmin verify <tx-hash> <target> <sig> [<args>]
-###    or: mkradmin verify <tx-hash> <target> [<data>]
+###    or: mkradmin verify <tx-hash> <target> <data>
 ###
 ### Verify that <tx-hash> creates a proposal to call <target> with <data>.
 ### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
 set -e
-[[ $2 ]] || { mkradmin verify --help; exit 1; }
-target=$(seth --to-address "${2?missing target address}")
-data=$(seth calldata ${3+"${@:3}"})
-sig="propose(address,bytes,uint256)(uint)"
-expected=$(seth calldata "$sig" "${target#0x}" "${data#0x}" 0)
-actual=$(seth tx "$1" input)
-if diff -U9999 <(fold -w 64 <<<"$expected") <(fold -w 64 <<<"$actual"); then
-  echo "Transaction matches expected calldata."
-else
-  echo >&2 "${0##*/}: error: transaction does not match expected calldata"
-  exit 1
-fi
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
+[[ $3 ]] || { mkradmin verify --help; exit 1; }
+
+tx=$1
+actual=$(seth tx "$tx" input)
+actual=${actual#0x}
+
+target=$(seth --to-address "$2")
+target=${target#0x}
+calldata=$(seth calldata ${3+"${@:3}"})
+calldata=${calldata#0x}
+inner_sig=$3
+
+sig="propose(address,bytes,uint256)"
+expected=$(seth calldata "$sig" "$target" "$calldata" 0)
+expected=${expected#0x}
+
+explain() {
+  hash=$(seth calldata "$1")
+  hash=${hash#0x}
+  sed "s/$hash/$hash # $1/"
+}
+
+format() {
+  printf %s\\n "${1:0:8}" "${1:8:264}" "${1:272}" | fold -w64 |
+  explain "$sig" | explain "$inner_sig"
+}
+
+actual=$(format "$actual")
+expected=$(format "$expected")
+
+diff -U9999 <(echo "$actual") <(echo "$expected") ||
+fail "error: transaction does not match expected calldata"
+
+echo "$actual"
+echo "Transaction matches expected calldata."

@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 ### mkradmin-action -- print information about a multisig action
 set -e
-if ! [[ $1 ]] || [[ $1 = -* ]]; then
-  exec mkradmin ls "$@"
-fi
-
+action=${1?which action?}
 sig="getActionStatus(uint256)(uint256,uint256,bool,address,uint256)"
-values=($(seth call @maker_multisig "$sig" "$1"))
+values=($(seth call @mkr_ms "$sig" "$action"))
 
-action=$1
 confirmations=$(seth --to-dec "${values[0]}")
 expiration=$(seth --to-dec "${values[1]}")
 triggered=${values[2]}
@@ -22,7 +18,7 @@ else
   expired=false
 fi
 
-quorum=$(mkradmin --quorum)
+quorum=${MKRADMIN_QUORUM-$(mkradmin info | seth --field quorum)}
 if ((confirmations >= quorum)); then
   confirmed=true
 else

@@ -4,7 +4,7 @@ header=$(grep -oP '^(\S)\1\1( \K.*)?' "$file" | perl -pe 's/^(\S)\1\1$//')
 
 if ! [[ $header ]]; then
   sed "s/^/${0##*/}: /" "$file"
-elif [[ `wc -l <<<"$header"` = 1 ]]; then
+elif [[ $(wc -l <<<"$header") = 1 ]]; then
   echo "$header"
 else
   sed 1d <<<"$header"
@@ -14,8 +14,6 @@ if ! [[ $1 ]]; then
   for file in ${0%/*}/$name-*; do
     if [[ -L $file ]]; then
       continue
-    elif [[ $file = */$name---* ]]; then
-      utils+=("$file")
     else
       commands+=("$file")
     fi

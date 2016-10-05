@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-set -e
 ### mkradmin-ls -- list proposed multisig actions
 ### Usage: mkradmin ls [-a|--all]
+set -e
 
-info=$(mkradmin --info)
-export MKRADMIN_INFO=$info
+info=$(mkradmin info)
 quorum=$(seth --field quorum <<<"$info")
 admins=$(seth --field admins <<<"$info")
 actions=$(seth --field actions <<<"$info")
+
+export MKRADMIN_QUORUM=$quorum
 
 case $1 in -a|--all) all=1; shift; esac
 if [[ $1 ]]; then all=1; else set -- $(seq "$actions"); fi
