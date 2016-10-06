@@ -37,7 +37,7 @@ format() {
 actual=$(format "$actual")
 expected=$(format "$expected")
 
-diff -U9999 <(echo "$actual") <(echo "$expected") ||
+diff -U9999 <(echo "$expected") <(echo "$actual") ||
 fail "error: transaction does not match expected calldata"
 
 echo "$actual"
