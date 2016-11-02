@@ -19,7 +19,8 @@ Proposing multisig action...
 .
 
 sig="propose(address,bytes,uint256)(uint)"
-n=$(seth send @mkr_ms "$sig" "${target#0x}" "${calldata#0x}" 0)
+value=${MKRADMIN_VALUE-0}
+n=$(seth send @mkr_ms "$sig" "${target#0x}" "${calldata#0x}" "$value")
 n=$(seth --to-dec "$n")
 
 [[ $n -gt 0 ]] || fail "error: failed to create proposal"

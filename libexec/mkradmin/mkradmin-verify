@@ -20,13 +20,18 @@ calldata=${calldata#0x}
 inner_sig=$3
 
 sig="propose(address,bytes,uint256)"
-expected=$(seth calldata "$sig" "$target" "$calldata" 0)
+value=${MKRADMIN_VALUE-0}
+expected=$(seth calldata "$sig" "$target" "$calldata" "$value")
 expected=${expected#0x}
 
 explain() {
   hash=$(seth calldata "$1")
   hash=${hash#0x}
-  sed "s/$hash/$hash # $1/"
+  if [[ $hash = '' ]]; then
+    cat
+  else
+    sed "s/$hash/$hash # $1/"
+  fi
 }
 
 format() {
