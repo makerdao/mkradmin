@@ -15,6 +15,7 @@ calldata=$(seth calldata ${2+"${@:2}"})
 cat >&2 <<.
 Proposing multisig action...
   target     $target
+  value      ${MKRADMIN_VALUE-0}
   calldata   $calldata
 .
 
