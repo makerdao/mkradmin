@@ -21,7 +21,6 @@ if [[ $MKRADMIN_MULTISIG_VERSION = 2016-02 ]]; then
 else
   target=$(seth --to-address "${values[3]}")
   value=$(seth --to-dec "${values[4]}")
-  value=$(seth --to-eth "$value")
 fi
 
 if (($(date +%s) >= expiration)); then
