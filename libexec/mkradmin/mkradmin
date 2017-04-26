@@ -23,4 +23,4 @@ if ! [[ $MKRADMIN_RUNNING ]]; then
   fi
 fi
 
-SETH_FROM=@mkradmin_account mkradmin-"$@"
+ETH_FROM=@mkradmin_account mkradmin-"$@"
